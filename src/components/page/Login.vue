@@ -2,7 +2,7 @@
     <div class="login-wrap">
         <div class="ms-login">
             <div class="ms-title">后台管理系统</div>
-            <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content" v-if="ishow">
+            <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content" v-show="!isShow">
                 <el-form-item prop="username">
                     <el-input v-model="param.username" placeholder="username">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
@@ -19,19 +19,19 @@
                     </el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm()">登录</el-button>
+                    <el-button type="primary" @click="loginForm()">登录</el-button>
                 </div>
-                <div class="login-tips">还没有账号?&nbsp;<a href="#" @click="ishow=!ishow">免费注册</a><div/>
+                <div class="login-tips">还没有账号?&nbsp;<a href="#" @click="change">免费注册</a><div/>
                 </div>
             </el-form>
-            <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content" v-else>
-                <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username">
+            <el-form :model="param" :rules="rules" ref="register" label-width="0px" class="ms-content"  v-show="isShow">
+                <el-form-item prop="phone">
+                    <el-input v-model="param.phone" placeholder="phone">
                         <el-button slot="prepend" icon="el-icon-phone"></el-button>
                     </el-input>
                 </el-form-item>
-                <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username">
+                <el-form-item prop="code">
+                    <el-input v-model="param.code" placeholder="code">
                         <el-button slot="prepend" icon="el-icon-message"></el-button>
                         <el-button slot="append" type="primary" @click="send">{{message}}</el-button>
                     </el-input>
@@ -41,15 +41,15 @@
                             type="password"
                             placeholder="password"
                             v-model="param.password"
-                            @keyup.enter.native="submitForm()"
+                            @keyup.enter.native="registerForm()"
                     >
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm()">注册</el-button>
+                    <el-button type="primary" @click="registerForm()">注册</el-button>
                 </div>
-                <div class="login-tips">已有账号?&nbsp;<a href="#" @click="ishow=!ishow">立即登录</a><div/>
+                <div class="login-tips">已有账号?&nbsp;<a href="#" @click="change">立即登录</a><div/>
                 </div>
             </el-form>
         </div>
@@ -57,25 +57,43 @@
 </template>
 
 <script>
+import { sendCodeApi,userRegisterApi } from "@/api/index";
+function isvalidPhone(str) {
+    const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+    return reg.test(str)
+}
+let validPhone=(rule, value,callback)=>{
+    if (!value){
+        callback(new Error('请输入电话号码'))
+    }else  if (!isvalidPhone(value)){
+        callback(new Error('请输入正确的11位手机号码'))
+    }else {
+        callback()
+    }
+}
 export default {
     data: function() {
         return {
             flag:true,
-            ishow:false,
+            isShow:false,
             message:'发送验证码',
             number:60,
             param: {
-                username: 'admin',
-                password: '123123',
+                username: '',
+                password: '',
+                phone:'',
+                code:''
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                phone: [{ required: true,validator:validPhone, trigger: 'blur' }],
+                code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
             },
         };
     },
     methods: {
-        submitForm() {
+        loginForm() {
             this.$refs.login.validate(valid => {
                 if (valid) {
                     this.$message.success('登录成功');
@@ -83,7 +101,22 @@ export default {
                     this.$router.push('/');
                 } else {
                     this.$message.error('请输入账号和密码');
-                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        },
+        registerForm() {
+            this.$refs.register.validate(valid => {
+                if (valid) {
+                    // localStorage.setItem('ms_username', this.param.username);
+                    userRegisterApi(this.param.phone,this.param.code,this.param.password).then(res=>{
+                        if(res.code!=0){
+                            this.$message.success(res.msg);
+                        }else{
+                            this.$message.error(res.msg);
+                        }
+                    })
+                } else {
                     return false;
                 }
             });
@@ -94,7 +127,6 @@ export default {
                 this.message="发送验证码"
                 this.number=60
             }else{
-                console.log("11111")
                 this.flag=false
                 this.message = this.number+"秒再次发送"
                 this.number--;
@@ -105,8 +137,26 @@ export default {
             if(!this.flag){
                 console.log("操作频繁")
             }else{
+                sendCodeApi(this.param.phone).then(res=>{
+                    if(res.code != 0){
+                        this.$message({
+                            message:res.msg,
+                            type: 'error'
+                        });
+                    }else{
+                        this.$message({
+                            message:'发送成功',
+                            type: 'success'
+                        });
+                    }
+                })
                 this.sendCode()
             }
+        },
+        change(){
+            this.isShow = !this.isShow
+            this.$refs.login.resetFields();
+            this.$refs.register.resetFields();
         }
     },
 };
