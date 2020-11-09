@@ -30,3 +30,16 @@ export const userRegisterApi=(userTelephoneNumber,code,userPassword)=>{
         }
     })
 }
+
+/**
+ * 用户登录
+ */
+export const userLoginApi=(userTelephoneNumber,userPassword)=>{
+    return request({
+        url:"/user/login",
+        method:'post',
+        data:{
+            userTelephoneNumber,userPassword
+        }
+    })
+}

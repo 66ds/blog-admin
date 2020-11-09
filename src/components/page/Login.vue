@@ -13,7 +13,6 @@
                         type="password"
                         placeholder="password"
                         v-model="param.password"
-                        @keyup.enter.native="submitForm()"
                     >
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
@@ -41,7 +40,6 @@
                             type="password"
                             placeholder="password"
                             v-model="param.password"
-                            @keyup.enter.native="registerForm()"
                     >
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
@@ -57,14 +55,14 @@
 </template>
 
 <script>
-import { sendCodeApi,userRegisterApi } from "@/api/index";
+import { sendCodeApi,userRegisterApi,userLoginApi } from "@/api/index";
 function isvalidPhone(str) {
     const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
     return reg.test(str)
 }
 let validPhone=(rule, value,callback)=>{
     if (!value){
-        callback(new Error('请输入电话号码'))
+        callback(new Error('请输入手机号码'))
     }else  if (!isvalidPhone(value)){
         callback(new Error('请输入正确的11位手机号码'))
     }else {
@@ -96,11 +94,16 @@ export default {
         loginForm() {
             this.$refs.login.validate(valid => {
                 if (valid) {
-                    this.$message.success('登录成功');
-                    localStorage.setItem('ms_username', this.param.username);
-                    this.$router.push('/');
+                    userLoginApi(this.param.username,this.param.password).then(res=>{
+                        if(res.code!=0){
+                            this.$message.error(res.msg);
+                        }else{
+                            // console.log(res)
+                            this.$message.success("登录成功");
+                            // this.$router.push('/');
+                        }
+                    })
                 } else {
-                    this.$message.error('请输入账号和密码');
                     return false;
                 }
             });
@@ -111,9 +114,9 @@ export default {
                     // localStorage.setItem('ms_username', this.param.username);
                     userRegisterApi(this.param.phone,this.param.code,this.param.password).then(res=>{
                         if(res.code!=0){
-                            this.$message.success(res.msg);
-                        }else{
                             this.$message.error(res.msg);
+                        }else{
+                            this.$message.success("注册成功");
                         }
                     })
                 } else {
@@ -134,20 +137,18 @@ export default {
             }
         },
         send(){
+            if(!isvalidPhone(this.param.phone)){
+                this.$message.error("请填写正确的手机号")
+                return
+            }
             if(!this.flag){
-                console.log("操作频繁")
+                this.$message.error("操作频繁")
             }else{
                 sendCodeApi(this.param.phone).then(res=>{
                     if(res.code != 0){
-                        this.$message({
-                            message:res.msg,
-                            type: 'error'
-                        });
+                        this.$message.error(res.msg);
                     }else{
-                        this.$message({
-                            message:'发送成功',
-                            type: 'success'
-                        });
+                        this.$message.success("发送成功");
                     }
                 })
                 this.sendCode()
