@@ -64,12 +64,12 @@ export default {
                 {
                     icon: 'el-icon-lx-cascades',
                     index: 'table',
-                    title: '基础表格'
+                    title: '文章管理'
                 },
                 {
                     icon: 'el-icon-lx-copy',
                     index: 'tabs',
-                    title: 'tab选项卡'
+                    title: '标签管理'
                 },
                 {
                     icon: 'el-icon-lx-calendar',
@@ -103,17 +103,17 @@ export default {
                 {
                     icon: 'el-icon-lx-emoji',
                     index: 'icon',
-                    title: '自定义图标'
+                    title: '评论管理'
                 },
                 {
                     icon: 'el-icon-pie-chart',
                     index: 'charts',
-                    title: 'schart图表'
+                    title: '友链管理'
                 },
                 {
                     icon: 'el-icon-rank',
                     index: '6',
-                    title: '拖拽组件',
+                    title: '私信管理',
                     subs: [
                         {
                             index: 'drag',
@@ -128,12 +128,37 @@ export default {
                 {
                     icon: 'el-icon-lx-global',
                     index: 'i18n',
-                    title: '国际化功能'
+                    title: '留言处理'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'i18n',
+                    title: '分类管理'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'i18n',
+                    title: '用户关注'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'i18n',
+                    title: '用户好友'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'i18n',
+                    title: '访客记录'
+                },
+                {
+                    icon: 'el-icon-lx-global',
+                    index: 'i18n',
+                    title: '基本信息'
                 },
                 {
                     icon: 'el-icon-lx-warn',
                     index: '7',
-                    title: '错误处理',
+                    title: '系统消息处理',
                     subs: [
                         {
                             index: 'permission',

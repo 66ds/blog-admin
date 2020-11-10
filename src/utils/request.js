@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { MessageBox } from 'element-ui';
+
+axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");//设置请求头token
 
 const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
@@ -20,7 +23,16 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     response => {
         if (response.status === 200) {
-            return response.data;
+            if(response.data.code === 10008){
+                MessageBox.alert(response.data.msg, {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        location.href="/login"
+                    }
+                });
+            }else{
+                return response.data;
+            }
         } else {
             Promise.reject();
         }

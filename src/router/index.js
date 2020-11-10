@@ -27,47 +27,71 @@ export default new Router({
                 {
                     path: '/table',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '基础表格' }
+                    meta: { title: '文章管理' }
                 },
                 {
                     path: '/tabs',
                     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: 'tab选项卡' }
+                    meta: { title: '标签管理' }
                 },
                 {
                     path: '/form',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
-                    meta: { title: '基本表单' }
+                    meta: { title: '评论管理' }
                 },
                 {
                     // 富文本编辑器组件
                     path: '/editor',
                     component: () => import(/* webpackChunkName: "editor" */ '../components/page/VueEditor.vue'),
-                    meta: { title: '富文本编辑器' }
+                    meta: { title: '友链管理' }
                 },
                 {
                     // markdown组件
                     path: '/markdown',
                     component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
-                    meta: { title: 'markdown编辑器' }
+                    meta: { title: '私信管理' }
+                },
+                {
+                    // markdown组件
+                    path: '/markdown',
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    meta: { title: '留言管理' }
+                },
+                {
+                    // markdown组件
+                    path: '/markdown',
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    meta: { title: '系统消息管理' }
                 },
                 {
                     // 图片上传组件
                     path: '/upload',
                     component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
-                    meta: { title: '文件上传' }
+                    meta: { title: '分类管理' }
+                },
+                {
+                    // 图片上传组件
+                    path: '/upload',
+                    component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
+                    meta: { title: '用户关注' }
+                },
+                {
+                    // 图片上传组件
+                    path: '/upload',
+                    component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
+                    meta: { title: '用户好友' }
                 },
                 {
                     // vue-schart组件
                     path: '/charts',
                     component: () => import(/* webpackChunkName: "chart" */ '../components/page/BaseCharts.vue'),
-                    meta: { title: 'schart图表' }
+                    meta: { title: '访客记录' }
                 },
                 {
                     // 拖拽列表组件
                     path: '/drag',
                     component: () => import(/* webpackChunkName: "drag" */ '../components/page/DragList.vue'),
-                    meta: { title: '拖拽列表' }
+                    meta: { title: '基本信息' }
                 },
                 {
                     // 拖拽Dialog组件
@@ -90,12 +114,12 @@ export default new Router({
                 {
                     path: '/404',
                     component: () => import(/* webpackChunkName: "404" */ '../components/page/404.vue'),
-                    meta: { title: '404' }
+                    meta: { title: '404'}
                 },
                 {
                     path: '/403',
                     component: () => import(/* webpackChunkName: "403" */ '../components/page/403.vue'),
-                    meta: { title: '403' }
+                    meta: { title: '403'}
                 },
                 {
                     path: '/donate',
@@ -107,11 +131,12 @@ export default new Router({
         {
             path: '/login',
             component: () => import(/* webpackChunkName: "login" */ '../components/page/Login.vue'),
-            meta: { title: '登录' }
+            meta: { title: '登录',requiredAuth:true}
         },
         {
             path: '*',
             redirect: '/404'
         }
-    ]
+    ],
+    mode:'history',
 });

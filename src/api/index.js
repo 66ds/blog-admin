@@ -1,10 +1,12 @@
 import request from '../utils/request';
 
-export const fetchData = query => {
+export const fetchData = (token) => {
     return request({
-        url: './table.json',
+        url: '/api/v1/pri/users/list',
         method: 'get',
-        params: query
+        headers:{
+            token
+        }
     });
 };
 
@@ -14,7 +16,7 @@ export const fetchData = query => {
  */
 export const sendCodeApi = (phone) => {
     return request({
-        url:"/sms/send/"+phone
+        url:"/api/v1/pub/sms/send/"+phone
     })
 }
 
@@ -23,7 +25,7 @@ export const sendCodeApi = (phone) => {
  */
 export const userRegisterApi=(userTelephoneNumber,code,userPassword)=>{
     return request({
-        url:"/user/register",
+        url:"/api/v1/pub/user/register",
         method: 'post',
         data: {
             userTelephoneNumber,code,userPassword
@@ -36,7 +38,7 @@ export const userRegisterApi=(userTelephoneNumber,code,userPassword)=>{
  */
 export const userLoginApi=(userTelephoneNumber,userPassword)=>{
     return request({
-        url:"/user/login",
+        url:"/api/v1/pub/user/login",
         method:'post',
         data:{
             userTelephoneNumber,userPassword
