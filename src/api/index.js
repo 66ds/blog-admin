@@ -1,8 +1,8 @@
 import request from '../utils/request';
 
-export const fetchData = (token) => {
+export const articlesListApi = (token) => {
     return request({
-        url: '/api/v1/pri/users/list',
+        url: '/api/v1/pri/articles/list',
         method: 'get',
         headers:{
             token
@@ -62,12 +62,11 @@ export const fileUploadApi=(file,token)=>{
 /**
  * 文章添加
  */
-export const articlesAddApi=()=>{
+export const articlesAddApi=(articleForm,token)=>{
     return request({
         url:"/api/v1/pri/articles/add",
         method:"post",
-        data:{
-
-        }
+        data:articleForm,
+        headers: {token}
     })
 }

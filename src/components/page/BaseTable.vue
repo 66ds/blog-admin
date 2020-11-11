@@ -43,51 +43,36 @@
                     @selection-change="handleSelectionChange"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="发表用户" align="center"></el-table-column>
-                <el-table-column prop="name" label="标题" align="center"></el-table-column>
-                <el-table-column prop="name" label="内容" align="center"></el-table-column>
-                <el-table-column prop="name" label="浏览量" align="center"></el-table-column>
-                <el-table-column prop="name" label="评论总数" align="center"></el-table-column>
-                <el-table-column prop="name" label="文章赞总数" align="center"></el-table-column>
-                <el-table-column prop="name" label="模式" align="center">
+                <el-table-column prop="articleId" label="id" width="55" align="center"></el-table-column>
+                <el-table-column prop="userId" label="发表用户" align="center"></el-table-column>
+                <el-table-column prop="articleTitle" label="标题" align="center"></el-table-column>
+                <el-table-column prop="articleContent" label="内容" align="center" :show-overflow-tooltip="true"></el-table-column>
+                <el-table-column prop="articleViews" label="浏览量" align="center"></el-table-column>
+                <el-table-column prop="articleCommentCount" label="评论总数" align="center"></el-table-column>
+                <el-table-column prop="articleLikeCount" label="文章赞总数" align="center"></el-table-column>
+                <el-table-column prop="articleType" label="模式" align="center">
                     <template slot-scope="scope">
-                        <el-tag
-                                :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}
-                        </el-tag>
+                            <div>
+                                {{scope.row.articleType==0?'私有':scope.row.articleType==1?'公开':'仅为好友看'}}
+                            </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="是否置顶" align="center">
+                <el-table-column prop="articleUp" label="是否置顶" align="center">
                     <template slot-scope="scope">
-                        <el-tag
-                                :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}
-                        </el-tag>
+                            <div>
+                                {{scope.row.articleUp==0?'非置顶':'置顶'}}
+                            </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="是否推荐" align="center">
+                <el-table-column prop="articleSupport" label="是否推荐" align="center">
                     <template slot-scope="scope">
-                        <el-tag
-                                :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}
-                        </el-tag>
+                        <div>
+                            {{scope.row.articleSupport==0?'非推荐':'推荐'}}
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="账户余额" align="center">
-                    <template slot-scope="scope">￥{{scope.row.money}}</template>
-                </el-table-column>
-                <!--    <el-table-column label="头像(查看大图)" align="center">
-                        <template slot-scope="scope">
-                            <el-image
-                                class="table-td-thumb"
-                                :src="scope.row.thumb"
-                                :preview-src-list="[scope.row.thumb]"
-                            ></el-image>
-                        </template>
-                    </el-table-column>-->
 
-                <el-table-column prop="date" label="发布时间" align="center"></el-table-column>
+                <el-table-column prop="articleDate" label="发布时间" width="160" align="center"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
                         <el-button
@@ -120,14 +105,14 @@
 
 
         <!-- 文章的填写和编辑-->
-        <el-dialog :title="articleForm.articleContent" :visible.sync="addArticle" width="60%">
+        <el-dialog title="文章内容" :visible.sync="addArticle" width="60%" @close="closeDialog">
             <el-form :model="articleForm" :rules="rules" ref="articleForm" label-width="80px" label-position="right" class="demo-ruleForm">
                 <el-form-item label="文章标题" prop="articleTitle">
                     <el-input v-model="articleForm.articleTitle" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="文章内容" prop="articleContent">
                     <!-- 图片上传组件辅助-->
-                    <mavon-editor v-model="articleForm.articleContent" ref="md" @imgAdd="$imgAdd" @change="getValue" style="min-height: 600px;border: 1px solid #DCDFE6;box-shadow: 0 0 0 0;"/>
+                    <mavon-editor ref="md" v-model="articleForm.articleContent" @imgAdd="$imgAdd" @change="getValue" style="min-height: 600px;border: 1px solid #DCDFE6;box-shadow: 0 0 0 0;"/>
                 </el-form-item>
                 <el-form-item label="文章模式" prop="articleType">
                     <el-select v-model="articleForm.articleType" placeholder="请选择文章模式">
@@ -136,11 +121,11 @@
                         <el-option label="仅为好友看" value="2"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="是否置顶">
-                    <el-switch v-model="articleForm.articleUp"></el-switch>
+                <el-form-item label="是否置顶" prop="articleUp">
+                    <el-switch v-model="articleForm.articleUp" active-value="1" inactive-value="0"></el-switch>
                 </el-form-item>
-                <el-form-item label="是否推荐">
-                    <el-switch v-model="articleForm.articleSupport"></el-switch>
+                <el-form-item label="是否推荐" prop="articleSupport">
+                    <el-switch v-model="articleForm.articleSupport" inactive-value="0" active-value="1"></el-switch>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -152,7 +137,7 @@
 </template>
 
 <script>
-    import { fetchData,fileUploadApi} from '../../api/index';
+    import { articlesListApi,fileUploadApi,articlesAddApi} from '../../api/index';
     import { mavonEditor } from 'mavon-editor'
     import 'mavon-editor/dist/css/index.css'
     export default {
@@ -173,7 +158,9 @@
                 form: {},
                 idx: -1,
                 id: -1,
+                html:'',
                 articleForm: {
+                    articlesId:'',
                     articleTitle: '',
                     articleContent: '',
                     articleType: '',
@@ -202,9 +189,9 @@
         methods: {
             // 获取 easy-mock 的模拟数据
             getData() {
-                fetchData(this.$store.state.token).then(res => {
-                    this.tableData = res.list;
-                    this.pageTotal = res.pageTotal || 50;
+                articlesListApi(this.$store.state.token).then(res => {
+                    this.tableData = res.data.list;
+                    this.pageTotal = res.data.totalPage || 50;
                 });
             },
             // 触发搜索按钮
@@ -259,20 +246,29 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        this.articleForm.articleContent = this.html
+                        articlesAddApi(this.articleForm,this.$store.getters.getToken).then(res=>{
+                            if(res.code==0){
+                                this.$message.success("添加成功")
+                                //关闭弹窗
+                                this.addArticle = false;
+                                //重新渲染表格
+                                this.getData();
+                            }else{
+                                this.$message.error(res.msg)
+                            }
+                        }).catch(e=>{
+                            this.$message.error(e);
+                        })
                     } else {
-                        console.log('error submit!!');
                         return false;
                     }
                 });
             },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
-            },
             getValue(value, html) {
-                // console.log(html);
+                this.html = html;
             },
-            // 绑定@imgAdd event
+            //上传图片markdown
             $imgAdd(pos, $file){
                 // 第一步.将图片上传到服务器.
                 let formdata = new FormData();
@@ -290,6 +286,11 @@
                 }).catch(e=>{
                     this.$message.error(e);
                 })
+            },
+            //关闭弹窗重置表单
+            closeDialog(){
+                this.articleForm.articleContent=''
+                this.$refs.articleForm.resetFields();
             }
         }
     };

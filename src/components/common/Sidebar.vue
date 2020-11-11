@@ -107,12 +107,12 @@ export default {
                 },
                 {
                     icon: 'el-icon-pie-chart',
-                    index: 'charts',
+                    index: 'charts7',
                     title: '友链管理'
                 },
                 {
                     icon: 'el-icon-rank',
-                    index: '6',
+                    index: 'charts6',
                     title: '私信管理',
                     subs: [
                         {
@@ -127,37 +127,37 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'charts5',
                     title: '留言处理'
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'charts4',
                     title: '分类管理'
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'charts3',
                     title: '用户关注'
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'charts2',
                     title: '用户好友'
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'charts1',
                     title: '访客记录'
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'i18n',
+                    index: 'donate1',
                     title: '基本信息'
                 },
                 {
                     icon: 'el-icon-lx-warn',
-                    index: '7',
+                    index: 'donate',
                     title: '系统消息处理',
                     subs: [
                         {
