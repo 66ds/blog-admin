@@ -45,3 +45,29 @@ export const userLoginApi=(userTelephoneNumber,userPassword)=>{
         }
     })
 }
+
+
+/**
+ * 文件上传
+ */
+export const fileUploadApi=(file,token)=>{
+    return request({
+        url:"/api/v1/pri/oos/upload",
+        method:"post",
+        data:file,
+        headers: { 'Content-Type': 'multipart/form-data',token}
+    })
+}
+
+/**
+ * 文章添加
+ */
+export const articlesAddApi=()=>{
+    return request({
+        url:"/api/v1/pri/articles/add",
+        method:"post",
+        data:{
+
+        }
+    })
+}

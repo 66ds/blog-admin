@@ -98,6 +98,7 @@
             loginForm() {
                 this.$refs.login.validate(valid => {
                     if (valid) {
+                        console.log("111")
                         userLoginApi(this.param.username, this.param.password).then(res => {
                             if (res.code != 0) {
                                 this.$message.error(res.msg);
@@ -108,6 +109,8 @@
                                 //跳转
                                 this.$router.push('/');
                             }
+                        }).catch((e)=>{
+                            this.$message.error(e);
                         });
                     } else {
                         return false;
@@ -124,7 +127,9 @@
                             } else {
                                 this.$message.success('注册成功');
                             }
-                        });
+                        }).catch((e)=>{
+                            this.$message.error(e);
+                        });;
                     } else {
                         return false;
                     }
@@ -156,7 +161,9 @@
                         } else {
                             this.$message.success('发送成功');
                         }
-                    });
+                    }).catch((e)=>{
+                        this.$message.error(e);
+                    });;
                     this.sendCode();
                 }
             },

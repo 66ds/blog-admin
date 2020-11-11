@@ -11,7 +11,7 @@
                 mavonEditor：基于Vue的markdown编辑器。
                 访问地址：<a href="https://github.com/hinesboy/mavonEditor" target="_blank">mavonEditor</a>
             </div>
-            <mavon-editor v-model="content" ref="md" @imgAdd="$imgAdd" @change="change" style="min-height: 600px"/>
+            <mavon-editor v-model="content" ref="md" @imgAdd="$imgAdd" @change="change" style="min-height: 600px;border: 1px solid #DCDFE6 !important;box-shadow: 0 0 0 0;"/>
             <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
         </div>
     </div>
@@ -40,7 +40,7 @@
                 formdata.append('file', $file);
                 // 这里没有服务器供大家尝试，可将下面上传接口替换为你自己的服务器接口
                 this.$axios({
-                    url: '/common/upload',
+                    url: '/oos/upload',
                     method: 'post',
                     data: formdata,
                     headers: { 'Content-Type': 'multipart/form-data' },

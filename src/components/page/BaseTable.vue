@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="article">
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
@@ -10,18 +10,29 @@
         <div class="container">
             <div class="handle-box">
                 <el-button
-                        type="primary"
+                        type="danger"
                         icon="el-icon-delete"
                         class="handle-del mr10"
                         @click="delAllSelection"
                 >批量删除
                 </el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
+                <el-select v-model="query.address" placeholder="置顶" class="handle-select mr10">
                     <el-option key="1" label="广东省" value="广东省"></el-option>
                     <el-option key="2" label="湖南省" value="湖南省"></el-option>
                 </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-select v-model="query.address" placeholder="推荐" class="handle-select mr10">
+                    <el-option key="1" label="广东省" value="广东省"></el-option>
+                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
+                </el-select>
+                <el-input v-model="query.name" placeholder="用户名或标题" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button
+                        type="success"
+                        icon="el-icon-plus"
+                        class="handle-del mr10"
+                        @click="addArticle=!addArticle"
+                >添加文章
+                </el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -107,31 +118,48 @@
             </div>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
+
+        <!-- 文章的填写和编辑-->
+        <el-dialog :title="articleForm.articleContent" :visible.sync="addArticle" width="60%">
+            <el-form :model="articleForm" :rules="rules" ref="articleForm" label-width="80px" label-position="right" class="demo-ruleForm">
+                <el-form-item label="文章标题" prop="articleTitle">
+                    <el-input v-model="articleForm.articleTitle" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
+                <el-form-item label="文章内容" prop="articleContent">
+                    <!-- 图片上传组件辅助-->
+                    <mavon-editor v-model="articleForm.articleContent" ref="md" @imgAdd="$imgAdd" @change="getValue" style="min-height: 600px;border: 1px solid #DCDFE6;box-shadow: 0 0 0 0;"/>
+                </el-form-item>
+                <el-form-item label="文章模式" prop="articleType">
+                    <el-select v-model="articleForm.articleType" placeholder="请选择文章模式">
+                        <el-option label="私有" value="0"></el-option>
+                        <el-option label="公开" value="1"></el-option>
+                        <el-option label="仅为好友看" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否置顶">
+                    <el-switch v-model="articleForm.articleUp"></el-switch>
+                </el-form-item>
+                <el-form-item label="是否推荐">
+                    <el-switch v-model="articleForm.articleSupport"></el-switch>
                 </el-form-item>
             </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="addArticle = false">取 消</el-button>
+                <el-button type="primary" @click="submitForm('articleForm')">添 加</el-button>
+            </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import { fetchData } from '../../api/index';
-
+    import { fetchData,fileUploadApi} from '../../api/index';
+    import { mavonEditor } from 'mavon-editor'
+    import 'mavon-editor/dist/css/index.css'
     export default {
         name: 'basetable',
         data() {
             return {
+                addArticle: false,
                 query: {
                     address: '',
                     name: '',
@@ -141,12 +169,32 @@
                 tableData: [],
                 multipleSelection: [],
                 delList: [],
-                editVisible: false,
                 pageTotal: 0,
                 form: {},
                 idx: -1,
-                id: -1
+                id: -1,
+                articleForm: {
+                    articleTitle: '',
+                    articleContent: '',
+                    articleType: '',
+                    articleUp: false,
+                    articleSupport: false
+                },
+                rules: {
+                    articleTitle: [
+                        { required: true, message: '请输入文章标题', trigger: 'blur' }
+                    ],
+                    articleContent: [
+                        { required: true, message: '请输入文章内容', trigger: 'blur' }
+                    ],
+                    articleType: [
+                        { required: true, message: '请选择文章模式', trigger: 'change' }
+                    ]
+                }
             };
+        },
+        components: {
+            mavonEditor
         },
         created() {
             this.getData();
@@ -207,42 +255,81 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        alert('submit!');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            getValue(value, html) {
+                // console.log(html);
+            },
+            // 绑定@imgAdd event
+            $imgAdd(pos, $file){
+                // 第一步.将图片上传到服务器.
+                let formdata = new FormData();
+                formdata.append('file', $file);
+                fileUploadApi(formdata,this.$store.getters.getToken).then(res=>{
+                    if(res.code == 0){
+                        // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+                        // $vm.$img2Url 详情见本页末尾
+                        this.$message.success("上传成功");
+                        this.$refs.md.$img2Url(pos, res.data);
+                    }else{
+                        this.$message.error("上传失败");
+                        this.$refs.md.$refs.toolbar_left.$imgDelByFilename(res.msg)
+                    }
+                }).catch(e=>{
+                    this.$message.error(e);
+                })
             }
         }
     };
 </script>
 
-<style scoped>
-    .handle-box {
+<style>
+    .article .handle-box {
         margin-bottom: 20px;
     }
 
-    .handle-select {
+    .article .handle-select {
         width: 120px;
     }
 
-    .handle-input {
+    .article .handle-input {
         width: 300px;
         display: inline-block;
     }
 
-    .table {
+    .article .table {
         width: 100%;
         font-size: 14px;
     }
 
-    .red {
+    .article .red {
         color: #ff0000;
     }
 
-    .mr10 {
+    .article .mr10 {
         margin-right: 10px;
     }
 
-    .table-td-thumb {
+    .article .table-td-thumb {
         display: block;
         margin: auto;
         width: 40px;
         height: 40px;
+    }
+
+    .article .ql-snow .ql-picker-label::before {
+        position: absolute !important;
     }
 </style>
