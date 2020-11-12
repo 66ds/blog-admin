@@ -33,7 +33,7 @@ service.interceptors.response.use(
                 return response.data;
             }
         } else {
-            Promise.reject();
+            return Promise.reject("Internet Error");
         }
     },
     error => {

@@ -98,7 +98,6 @@
             loginForm() {
                 this.$refs.login.validate(valid => {
                     if (valid) {
-                        console.log("111")
                         userLoginApi(this.param.username, this.param.password).then(res => {
                             if (res.code != 0) {
                                 this.$message.error(res.msg);
