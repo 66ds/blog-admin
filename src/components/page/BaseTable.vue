@@ -130,9 +130,9 @@
                         <el-option label="仅为好友看" :value="2"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="文章标签" prop="">
+                <el-form-item label="文章标签" prop="labelNames">
                     <el-select
-                            v-model="value"
+                            v-model="articleForm.labelNames"
                             multiple
                             filterable
                             allow-create
@@ -192,7 +192,8 @@
                     articleType: '',
                     articleUp: 0,
                     articleSupport: 0,
-                    articleContentOrigin: ''
+                    articleContentOrigin: '',
+                    labelNames:[]
                 },
                 rules: {
                     articleTitle: [
@@ -203,9 +204,11 @@
                     ],
                     articleType: [
                         { required: true, message: '请选择文章模式', trigger: 'change' }
+                    ],
+                    labelNames: [
+                        { required: true, message: '请输入文章标签', trigger: 'blur' }
                     ]
-                },
-                value: []
+                }
             };
         },
         components: {
@@ -275,6 +278,10 @@
                 articlesInfoApi(row.articleId, this.$store.getters.getToken).then(res => {
                     if (res.code == 0) {
                         this.articleForm = res.data;
+                        if(res.data.labelsEntityList != ''&& res.data.labelsEntityList != null){
+                            //视图层更新
+                            this.$set(this.articleForm, 'labelNames', res.data.labelsEntityList.map(item=>item.labelName))
+                        }
                     }
                 }).catch(e => {
                     this.$message.error(e);
@@ -285,6 +292,7 @@
                 this.$set(this.query, 'page', val);
                 this.getData(this.query);
             },
+            //添加和编辑
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
