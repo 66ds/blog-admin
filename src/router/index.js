@@ -30,9 +30,9 @@ export default new Router({
                     meta: { title: '文章管理' }
                 },
                 {
-                    path: '/tabs',
-                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: '标签管理' }
+                    path: '/sort',
+                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/sort.vue'),
+                    meta: { title: '分类管理' }
                 },
                 {
                     path: '/form',
