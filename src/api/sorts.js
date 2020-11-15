@@ -40,3 +40,28 @@ export const sortsAddApi=(sortsForm,token)=>{
         headers: {token}
     })
 }
+
+/**
+ * 单个分类查询
+ */
+export const sortsInfoApi=(id,token)=>{
+    return request({
+        url:"/api/v1/pri/sorts/info/"+id,
+        method:"get",
+        headers:{token}
+    })
+}
+
+/**
+ * 文章编辑
+ */
+export const sortsUpdateApi=(sortForm,token)=>{
+    return request({
+        url:"/api/v1/pri/sorts/update",
+        method:"post",
+        data:sortForm,
+        headers:{
+            token
+        }
+    })
+}

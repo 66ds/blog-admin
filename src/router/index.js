@@ -26,12 +26,12 @@ export default new Router({
                 },
                 {
                     path: '/table',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
+                    component: () => import(/* webpackChunkName: "table" */ '../components/page/Articles.vue'),
                     meta: { title: '文章管理' }
                 },
                 {
                     path: '/sort',
-                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/sort.vue'),
+                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Sorts.vue'),
                     meta: { title: '分类管理' }
                 },
                 {

@@ -12,13 +12,23 @@ const service = axios.create({
 
 service.interceptors.request.use(
     config => {
-        return config;
+        if (config.method == 'post') {
+            config.data = {
+                ...config.data,
+                _t: Date.parse(new Date()) / 1000
+            }
+        } else if (config.method == 'get') {
+            config.params = {
+                _t: Date.parse(new Date()) / 1000,
+                ...config.params
+            }
+        }
+        return config
     },
     error => {
         return Promise.reject("Internet Error");
     }
 );
-
 service.interceptors.response.use(
     response => {
         if (response.status === 200) {

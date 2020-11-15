@@ -43,15 +43,16 @@
                         </div>
                         <el-table
                                 :data="tableData"
+                                v-loading="loading"
                                 border
                                 class="table"
                                 ref="multipleTable"
                                 header-cell-class-name="table-header"
                         >
                             <el-table-column prop="sortId" label="id" width="55" align="center"></el-table-column>
-                            <el-table-column prop="sortName" label="发表用户" align="center"></el-table-column>
-                            <el-table-column prop="sortAlias" label="标题" align="center"></el-table-column>
-                            <el-table-column prop="sortDescription" label="内容" align="center"
+                            <el-table-column prop="sortName" label="分类名称" align="center"></el-table-column>
+                            <el-table-column prop="sortAlias" label="分类别名" align="center"></el-table-column>
+                            <el-table-column prop="sortDescription" label="分类描述" align="center"
                                              :show-overflow-tooltip="true"></el-table-column>
                             <el-table-column prop="userId" label="创建用户" align="center"></el-table-column>
                             <el-table-column prop="parentSortId" label="父id" align="center"></el-table-column>
@@ -115,7 +116,7 @@
 
 <script>
 
-    import { sortsCatagorysApi, sortsListApi, sortsAddApi } from '../../api/sorts';
+    import { sortsCatagorysApi, sortsListApi, sortsAddApi,sortsInfoApi,sortsUpdateApi} from '../../api/sorts';
 
     export default {
         name: 'basetable',
@@ -133,6 +134,7 @@
                 menus: [],
                 token: this.$store.getters.getToken,
                 pageTotal: 0,
+                loading: true,
                 flag: true,
                 sortForm: {
                     sortId: '',
@@ -174,44 +176,88 @@
                 if (!value) return true;
                 return data.sortName.indexOf(value) !== -1;
             },
-            async handleNodeClick(data) {
+            handleNodeClick(data) {
                 //设置父id
                 this.$set(this.sortForm, 'parentSortId', data.sortId);
-                this.$set(this.query, 'sortId', data.sortId);
-                this.$set(this.query, 'page', 1);
-                //重新获取数据
-                const res = await this.sortsList(this.query, this.token);
-                this.tableData = res.data.list;
-                this.pageTotal = res.data.totalCount || 0;
             },
             // 触发搜索按钮
-            async handleSearch() {
+            handleSearch() {
                 this.$set(this.query, 'page', 1);
-                try {
-                    const res = await this.sortsList(this.query, this.token);
-                    this.tableData = res.data.list;
-                    this.pageTotal = res.data.totalCount || 0;
-                } catch (e) {
-                    this.$message.error(e);
-                }
+                this.sortsList(this.query, this.token);
             },
             // 获取文章列表数据
-            async getData(query) {
+            getData(query) {
+                //获取分类数据
+                this.sortsCatagory(this.token);
+                //获取表格数据
+                this.sortsList(query, this.token);
+            },
+            async sortsCatagory(token) {
                 try {
-                    const catagorys = await this.sortsCatagory(this.token);
-                    const res = await this.sortsList(query, this.token);
-                    this.menus = catagorys.data;
-                    this.tableData = res.data.list;
-                    this.pageTotal = res.data.totalCount || 0;
+                    const res = await sortsCatagorysApi(token);
+                    this.menus = res.data;
                 } catch (e) {
                     this.$message.error(e);
                 }
             },
-            sortsCatagory(token) {
-                return sortsCatagorysApi(token);
+            async sortsList(query, token) {
+                try {
+                    this.loading = true
+                    const res = await sortsListApi(query, token);
+                    this.tableData = res.data.list;
+                    this.pageTotal = res.data.totalCount || 0;
+                    this.loading = false
+                } catch (e) {
+                    this.$message.error(e);
+                }
+
             },
-            sortsList(query, token) {
-                return sortsListApi(query, token);
+            async sortsAdd(sortForm,token){
+                try{
+                    const res = await sortsAddApi(sortForm,token);
+                    if(res.code == 0){
+                        //重新设0
+                        this.$set(this.sortForm, 'parentSortId', 0);
+                        this.$message.success('添加成功');
+                        //关闭弹窗
+                        this.addSort = false;
+                        //重新渲染树
+                        this.sortsCatagory(this.token);
+                        //重新渲染表格
+                        this.$set(this.query, 'page', 1);
+                        this.sortsList(this.query, this.token);
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                }catch (e) {
+                    this.$message.error(e);
+                }
+            },
+            async sortsUpdate(sortForm,token){
+              try{
+                  const res = await sortsUpdateApi(sortForm,token);
+                  if(res.code == 0){
+                      this.$message.success('编辑成功');
+                      //关闭弹窗
+                      this.addSort = false;
+                      //重新渲染树
+                      this.sortsCatagory(this.token);
+                      //重新渲染表格
+                      this.sortsList(this.query, this.token);
+                  }else{
+                      this.$message.error(res.msg);
+                  }
+              }catch (e) {
+                  this.$message.error(e);
+              }
+            },
+            async sortsInfo(sortId,token){
+                try{
+                    const res = await sortsInfoApi(sortId,token);
+                    this.sortForm = res.data;
+                }catch (e) {
+                    this.$message.error(e);
+                }
             },
             // 删除操作
             async handleDelete(index, row) {
@@ -233,63 +279,23 @@
             async handleEdit(index, row) {
                 this.addSort = true;
                 this.flag = false;
-                articlesInfoApi(row.articleId, this.$store.getters.getToken).then(res => {
-                    if (res.code == 0) {
-                        this.sortForm = res.data;
-                        if (res.data.labelsEntityList != '' && res.data.labelsEntityList != null) {
-                            //视图层更新
-                            this.$set(this.sortForm, 'labelNames', res.data.labelsEntityList.map(item => item.labelName));
-                        }
-                    }
-                }).catch(e => {
-                    this.$message.error(e);
-                });
+                this.sortsInfo(row.sortId,this.token);
             },
             // 分页导航
             handlePageChange(val) {
+                //重新加载表格数据
                 this.$set(this.query, 'page', val);
-                this.getData(this.query);
+                this.sortsList(this.query, this.token);
             },
             //添加和编辑
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         if (this.flag) {
-                            sortsAddApi(this.sortForm, this.token).then(res => {
-                                if (res.code == 0) {
-                                    //重新设0
-                                    this.$set(this.sortForm, 'parentSortId', 0);
-                                    this.$message.success('添加成功');
-                                    //关闭弹窗
-                                    this.addSort = false;
-                                    //重新渲染树
-                                    return this.sortsCatagory(this.token);
-                                } else {
-                                    this.$message.error(res.msg);
-                                }
-                            }).then(res => {
-                                if (res.code == 0) {
-                                    this.menus = res.data;
-                                } else {
-                                    this.$message.error(res.msg);
-                                }
-                            }).catch(e => {
-                                this.$message.error(e);
-                            });
+                            //添加分类
+                            this.sortsAdd(this.sortForm, this.token);
                         } else {
-                            articlesUpdateApi(this.sortForm, this.$store.getters.getToken).then(res => {
-                                if (res.code == 0) {
-                                    this.$message.success('编辑成功');
-                                    //关闭弹窗
-                                    this.addSort = false;
-                                    //重新渲染表格
-                                    this.getData(this.query);
-                                } else {
-                                    this.$message.error(res.msg);
-                                }
-                            }).catch(e => {
-                                this.$message.error(e);
-                            });
+                            this.sortsUpdate(this.sortForm, this.token)
                         }
                     } else {
                         return false;
@@ -311,10 +317,6 @@
 <style>
     .sort .handle-box {
         margin-bottom: 20px;
-    }
-
-    .sort .handle-select {
-        width: 120px;
     }
 
     .sort .handle-input {

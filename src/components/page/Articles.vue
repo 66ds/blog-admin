@@ -46,6 +46,7 @@
                     ref="multipleTable"
                     header-cell-class-name="table-header"
                     @selection-change="handleSelectionChange"
+                    v-loading="loading"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="articleId" label="id" width="55" align="center"></el-table-column>
@@ -181,6 +182,7 @@
                     page: 1,
                     limit: 10
                 },
+                loading:true,
                 tableData: [],
                 delList: [],
                 pageTotal: 0,
@@ -220,9 +222,11 @@
         methods: {
             // 获取文章列表数据
             getData(query) {
+                this.loading = true
                 articlesListApi(query,this.$store.getters.getToken).then(res => {
                     this.tableData = res.data.list;
                     this.pageTotal = res.data.totalCount || 0;
+                    this.loading = false;
                 }).catch(e=>{
                     this.$message.error(e);
                 });
