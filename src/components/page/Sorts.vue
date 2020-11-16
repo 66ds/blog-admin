@@ -49,7 +49,7 @@
                                 ref="multipleTable"
                                 header-cell-class-name="table-header"
                         >
-                            <el-table-column prop="sortId" label="id" width="55" align="center"></el-table-column>
+                            <el-table-column prop="sortId" label="id" width="55" align="center" v-if="false"></el-table-column>
                             <el-table-column prop="sortName" label="分类名称" align="center"></el-table-column>
                             <el-table-column prop="sortAlias" label="分类别名" align="center"></el-table-column>
                             <el-table-column prop="sortDescription" label="分类描述" align="center"
@@ -116,7 +116,7 @@
 
 <script>
 
-    import { sortsCatagorysApi, sortsListApi, sortsAddApi,sortsInfoApi,sortsUpdateApi} from '../../api/sorts';
+    import { sortsCatagorysApi, sortsListApi, sortsAddApi,sortsInfoApi,sortsUpdateApi,sortsDeleteApi} from '../../api/sorts';
 
     export default {
         name: 'basetable',
@@ -227,7 +227,7 @@
                         this.$set(this.query, 'page', 1);
                         this.sortsList(this.query, this.token);
                     }else{
-                        this.$message.error(res.msg);
+                        this.$message.warning(res.msg);
                     }
                 }catch (e) {
                     this.$message.error(e);
@@ -245,7 +245,7 @@
                       //重新渲染表格
                       this.sortsList(this.query, this.token);
                   }else{
-                      this.$message.error(res.msg);
+                      this.$message.warning(res.msg);
                   }
               }catch (e) {
                   this.$message.error(e);
@@ -262,14 +262,16 @@
             // 删除操作
             async handleDelete(index, row) {
                 // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
+                this.$confirm('确定要删除该分类和它子分类吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    return articlesDeleteApi(row.articleId, this.$store.getters.getToken);
+                    return sortsDeleteApi(row.sortId, this.token);
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
                         this.getData(this.query);
+                    }else{
+                        this.$message.warning(e);
                     }
                 }).catch((e) => {
                     this.$message.error(e);

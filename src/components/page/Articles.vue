@@ -118,6 +118,9 @@
                 <el-form-item label="文章标题" prop="articleTitle">
                     <el-input v-model="articleForm.articleTitle" autocomplete="off"></el-input>
                 </el-form-item>
+                <el-form-item label="文章介绍" prop="articleIntroduce">
+                    <el-input v-model="articleForm.articleIntroduce" autocomplete="off"></el-input>
+                </el-form-item>
                 <el-form-item label="文章内容" prop="articleContentOrigin">
                     <!-- 图片上传组件辅助-->
                     <mavon-editor ref="md" v-model="articleForm.articleContentOrigin" @imgAdd="$imgAdd"
@@ -192,6 +195,7 @@
                     articleTitle: '',
                     articleContent: '',
                     articleType: '',
+                    articleIntroduce:'',
                     articleUp: 0,
                     articleSupport: 0,
                     articleContentOrigin: '',
@@ -209,6 +213,9 @@
                     ],
                     labelNames: [
                         { required: true, message: '请输入文章标签', trigger: 'blur' }
+                    ],
+                    articleIntroduce:[
+                        { required: true, message: '请输入文章介绍', trigger: 'blur' }
                     ]
                 }
             };

@@ -65,3 +65,17 @@ export const sortsUpdateApi=(sortForm,token)=>{
         }
     })
 }
+
+
+/**
+ * 删除分类
+ */
+export const sortsDeleteApi = (sortId,token)=>{
+    return request({
+        url:"/api/v1/pri/sorts/delete/"+sortId,
+        method:"get",
+        headers:{
+            token
+        }
+    })
+}
