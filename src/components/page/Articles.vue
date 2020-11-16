@@ -144,6 +144,9 @@
                             placeholder="允许填写多个">
                     </el-select>
                 </el-form-item>
+                <el-form-item label="文章分类" prop="sortIds">
+                    <cascader :options="data" :value="articleForm.sortIds" @sortCatagory="sortCatagory"/>
+                </el-form-item>
                 <el-form-item label="是否置顶" prop="articleUp">
                     <el-switch v-model="articleForm.articleUp" :active-value="1" :inactive-value="0"></el-switch>
                 </el-form-item>
@@ -169,6 +172,8 @@
         articlesDeleteApi,
         articlesDeleteBatchApi
     } from '../../api/articles';
+    import {sortsCatagorysApi} from '../../api/sorts'
+    import Cascader from '../common/Cascader';
     import { mavonEditor } from 'mavon-editor';
     import 'mavon-editor/dist/css/index.css';
 
@@ -189,6 +194,7 @@
                 tableData: [],
                 delList: [],
                 pageTotal: 0,
+                data:[],
                 flag: true,
                 articleForm: {
                     articleId: '',
@@ -199,7 +205,8 @@
                     articleUp: 0,
                     articleSupport: 0,
                     articleContentOrigin: '',
-                    labelNames:[]
+                    labelNames:[],
+                    sortIds:[]
                 },
                 rules: {
                     articleTitle: [
@@ -216,12 +223,16 @@
                     ],
                     articleIntroduce:[
                         { required: true, message: '请输入文章介绍', trigger: 'blur' }
-                    ]
+                    ],
+                    sortIds:[
+                        { required: true, message: '请输入文章分类', trigger: 'blur' }
+                    ],
                 }
             };
         },
         components: {
-            mavonEditor
+            mavonEditor,
+            Cascader
         },
         created() {
             this.getData(this.query);
@@ -237,6 +248,11 @@
                 }).catch(e=>{
                     this.$message.error(e);
                 });
+                sortsCatagorysApi(this.$store.getters.getToken).then(res=>{
+                    this.data = res.data
+                }).catch(e=>{
+                    this.$message.error(e);
+                })
             },
             // 触发搜索按钮
             handleSearch() {
@@ -366,13 +382,15 @@
             //关闭弹窗重置表单
             closeDialog() {
                 this.$refs.articleForm.resetFields();
+            },
+            sortCatagory(val){
+                this.articleForm.sortIds = val
             }
         }
     };
 </script>
 
 <style>
-    //全局
     @media only screen and (min-width: 321px) and (max-width: 768px){
         .handle-box{
             display: none;

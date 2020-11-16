@@ -49,7 +49,7 @@
                                 ref="multipleTable"
                                 header-cell-class-name="table-header"
                         >
-                            <el-table-column prop="sortId" label="id" width="55" align="center" v-if="false"></el-table-column>
+                            <el-table-column prop="sortId" label="id" width="55" align="center"></el-table-column>
                             <el-table-column prop="sortName" label="分类名称" align="center"></el-table-column>
                             <el-table-column prop="sortAlias" label="分类别名" align="center"></el-table-column>
                             <el-table-column prop="sortDescription" label="分类描述" align="center"
@@ -117,6 +117,7 @@
 <script>
 
     import { sortsCatagorysApi, sortsListApi, sortsAddApi,sortsInfoApi,sortsUpdateApi,sortsDeleteApi} from '../../api/sorts';
+
 
     export default {
         name: 'basetable',
@@ -269,6 +270,7 @@
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
+                        this.$set(this.query, 'page', 1);
                         this.getData(this.query);
                     }else{
                         this.$message.warning(e);
