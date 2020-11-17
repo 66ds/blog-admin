@@ -273,7 +273,7 @@
                         this.$set(this.query, 'page', 1);
                         this.getData(this.query);
                     }else{
-                        this.$message.warning(e);
+                        this.$message.warning(res.msg);
                     }
                 }).catch((e) => {
                     this.$message.error(e);

@@ -1,7 +1,9 @@
 <template>
     <div>
         <el-cascader
-                v-model="value"
+                filterable
+                clearable
+                v-model="val"
                 :options="options"
                 @change="handleChange"
                 placeholder="请输入文章分类"
@@ -16,13 +18,20 @@
                 props: {
                     label: 'sortName',
                     value: 'sortId'
-                }
+                },
+                //监听下面的value变化
+                val:''
             };
+        },
+        watch: {
+            value(newV,oldV) {
+               this.val = newV
+            }
         },
         props: ['options', 'value'],
         methods: {
             handleChange(value) {
-                this.$emit('sortCatagory', this.value);
+                this.$emit('sortCatagory', this.val);
             }
         }
     };

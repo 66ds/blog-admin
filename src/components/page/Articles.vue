@@ -35,7 +35,7 @@
                         type="success"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addArticle=!addArticle;flag=true"
+                        @click="handleAdd"
                 >添加文章
                 </el-button>
             </div>
@@ -248,11 +248,6 @@
                 }).catch(e=>{
                     this.$message.error(e);
                 });
-                sortsCatagorysApi(this.$store.getters.getToken).then(res=>{
-                    this.data = res.data
-                }).catch(e=>{
-                    this.$message.error(e);
-                })
             },
             // 触发搜索按钮
             handleSearch() {
@@ -269,7 +264,7 @@
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
-                        this.getData(this.query);
+                        this.handleSearch()
                     }
                 }).catch((e) => {
                     this.$message.error(e);
@@ -292,17 +287,21 @@
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
-                        this.getData(this.query)
+                        this.handleSearch()
                     }
                 }).catch((e) => {
                     this.$message.error(e);
                 });
             },
-            // 编辑操作
-            handleEdit(index, row) {
-                this.addArticle = true;
-                this.flag = false;
-                articlesInfoApi(row.articleId, this.$store.getters.getToken).then(res => {
+            sortsCatagory(){
+                sortsCatagorysApi(this.$store.getters.getToken).then(res=>{
+                    this.data = res.data
+                }).catch(e=>{
+                    this.$message.error(e);
+                })
+            },
+            articlesInfo(articleId){
+                articlesInfoApi(articleId, this.$store.getters.getToken).then(res => {
                     if (res.code == 0) {
                         this.articleForm = res.data;
                         if(res.data.labelsEntityList != ''&& res.data.labelsEntityList != null){
@@ -313,6 +312,18 @@
                 }).catch(e => {
                     this.$message.error(e);
                 });
+            },
+            // 编辑操作
+            handleEdit(index, row) {
+                this.addArticle = true;
+                this.flag = false;
+                this.sortsCatagory();
+                this.articlesInfo(row.articleId)
+            },
+            handleAdd(){
+                this.sortsCatagory();
+                this.addArticle=!this.addArticle;
+                this.flag=true
             },
             // 分页导航
             handlePageChange(val) {
@@ -330,9 +341,9 @@
                                     //关闭弹窗
                                     this.addArticle = false;
                                     //重新渲染表格
-                                    this.getData(this.query);
+                                    this.handleSearch()
                                 } else {
-                                    this.$message.error(res.msg);
+                                    this.$message.warning(res.msg);
                                 }
                             }).catch(e => {
                                 this.$message.error(e);
@@ -344,9 +355,9 @@
                                     //关闭弹窗
                                     this.addArticle = false;
                                     //重新渲染表格
-                                    this.getData(this.query);
+                                    this.handleSearch()
                                 } else {
-                                    this.$message.error(res.msg);
+                                    this.$message.warning(res.msg);
                                 }
                             }).catch(e => {
                                 this.$message.error(e);
