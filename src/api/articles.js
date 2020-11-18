@@ -44,7 +44,7 @@ export const articlesAddApi=(articleForm,token)=>{
  */
 export const articlesInfoApi=(id,token)=>{
     return request({
-        url:"/api/v1/pri/articles/info/"+id,
+        url:"/api/v1/pub/articles/info/"+id,
         method:"get",
         headers:{token}
     })
