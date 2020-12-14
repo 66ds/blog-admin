@@ -48,19 +48,19 @@ export default new Router({
                 {
                     // markdown组件
                     path: '/markdown',
-                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Stay.vue'),
                     meta: { title: '私信管理' }
                 },
                 {
                     // markdown组件
-                    path: '/markdown',
-                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    path: '/stay',
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Stay.vue'),
                     meta: { title: '留言管理' }
                 },
                 {
                     // markdown组件
                     path: '/markdown',
-                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
+                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Stay.vue'),
                     meta: { title: '系统消息管理' }
                 },
                 {

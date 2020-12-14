@@ -127,8 +127,8 @@ export default {
                 },
                 {
                     icon: 'el-icon-lx-global',
-                    index: 'charts5',
-                    title: '留言处理'
+                    index: 'stay',
+                    title: '留言管理'
                 },
                 {
                     icon: 'el-icon-lx-global',
