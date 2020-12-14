@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { MessageBox } from 'element-ui';
-
-axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");//设置请求头token
+import store from './../store/index';
 
 const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
@@ -12,6 +11,7 @@ const service = axios.create({
 
 service.interceptors.request.use(
     config => {
+        config.headers.token = store.getters.getToken; //设置请求头token
         if (config.method == 'post') {
             config.data = {
                 ...config.data,
