@@ -16,7 +16,6 @@
                         @click="delAllSelection"
                 >批量删除
                 </el-button>
-                <el-input v-model="query.name" placeholder="姓名" class="handle-input mr10"></el-input>
                 <el-input v-model="query.content" placeholder="内容或系统或浏览器" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
@@ -42,13 +41,13 @@
                         <el-button v-if="stayForm.stayMessageEntity"
                                 type="text"
                                 icon="el-icon-edit"
-                                @click="handleEdit(scope.$index, scope.row)"
+                                @click="checkReply(scope.$index, scope.row)"
                         >查看回复
                         </el-button>
                         <el-button v-else
                                    type="text"
                                    icon="el-icon-edit"
-                                   @click="handleEdit(scope.$index, scope.row)"
+                                   @click="publishReply(scope.$index, scope.row)"
                         >发表回复
                         </el-button>
                         <el-button
@@ -72,7 +71,25 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <!-- 分类的填写和编辑-->
+        <el-dialog title="分类" :visible.sync="addStay" width="60%" @close="closeDialog">
+            <el-form :model="sortForm" :rules="rules" ref="sortForm" label-width="80px" label-position="right"
+                     class="demo-ruleForm">
+                <el-form-item label="分类名称" prop="sortName">
+                    <el-input v-model="sortForm.sortName" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="分类别名" prop="sortAlias">
+                    <el-input v-model="sortForm.sortAlias" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="分类描述" prop="sortDescription">
+                    <el-input v-model="sortForm.sortDescription" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="addSort = false">取 消</el-button>
+                <el-button type="primary" @click="submitForm('sortForm')">{{flag==true?'添加':'编辑'}}</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -91,9 +108,8 @@
         name: 'basetable',
         data() {
             return {
-                addArticle: false,
+                addStay: false,
                 query: {
-                    name: '',
                     content:'',
                     page: 1,
                     limit: 10
