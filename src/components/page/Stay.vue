@@ -1,5 +1,5 @@
 <template>
-    <div class="article">
+    <div class="stay">
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
@@ -38,7 +38,7 @@
                 <el-table-column prop="stayChrome" label="浏览器" align="center"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button v-if="stayForm.stayMessageEntity"
+                        <el-button v-if="scope.row.stayMessageEntity"
                                 type="text"
                                 icon="el-icon-edit"
                                 @click="checkReply(scope.$index, scope.row)"
@@ -72,64 +72,51 @@
             </div>
         </div>
         <!-- 分类的填写和编辑-->
-        <el-dialog title="分类" :visible.sync="addStay" width="60%" @close="closeDialog">
-            <el-form :model="sortForm" :rules="rules" ref="sortForm" label-width="80px" label-position="right"
+        <el-dialog title="回复" :visible.sync="addStay" width="60%" @close="closeDialog">
+            <el-form :model="stayForm" :rules="rules" ref="stayForm" label-width="80px" label-position="right"
                      class="demo-ruleForm">
-                <el-form-item label="分类名称" prop="sortName">
-                    <el-input v-model="sortForm.sortName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="分类别名" prop="sortAlias">
-                    <el-input v-model="sortForm.sortAlias" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="分类描述" prop="sortDescription">
-                    <el-input v-model="sortForm.sortDescription" autocomplete="off"></el-input>
+                <el-form-item label="留言内容" prop="messageContent">
+                    <el-input type="textarea" v-model="stayForm.messageContent" maxlength="100"  show-word-limit :autosize="{ minRows: 4, maxRows: 5}"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="addSort = false">取 消</el-button>
-                <el-button type="primary" @click="submitForm('sortForm')">{{flag==true?'添加':'编辑'}}</el-button>
+                <el-button @click="addStay = false">取 消</el-button>
+                <el-button type="primary" @click="submitForm('stayForm')">{{flag==true?'添加':'编辑'}}</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import {stayMessageListApi} from '../../api/stay.js'
+    import {stayMessageListApi,addStayMessageApi,selectStayInfoApi,updateStayInfoApi} from '../../api/stay.js'
     import {
-        articlesListApi,
-        articlesInfoApi,
         articlesDeleteApi,
         articlesDeleteBatchApi
     } from '../../api/articles';
-    import {sortsCatagorysApi} from '../../api/sorts'
-    import 'mavon-editor/dist/css/index.css';
-
     export default {
         name: 'basetable',
         data() {
             return {
-                addStay: false,
                 query: {
                     content:'',
                     page: 1,
                     limit: 10
                 },
+                addStay: false,
                 loading:true,
                 tableData: [],
                 delList: [],
                 pageTotal: 0,
-                data:[],
                 flag: true,
                 stayForm: {
                     stayId: '',
                     messageContent: '',
-                    messageStayTime: '',
-                    userName: '',
-                    userImg:'',
-                    staySys: 0,
-                    stayChrome: 0,
-                    stayUserIp: '',
-                    stayMessageEntity:'',
+                    parentStayId:''
+                },
+                rules: {
+                    messageContent: [
+                        { required: true, message: '请输入留言内容', trigger: 'blur' }
+                    ]
                 },
             };
         },
@@ -143,7 +130,6 @@
             getData(query) {
                 this.loading = true
                 stayMessageListApi(query).then(res => {
-                    console.log(res)
                     this.tableData = res.data.list;
                     this.pageTotal = res.data.totalCount || 0;
                     this.loading = false;
@@ -195,89 +181,119 @@
                     this.$message.error(e);
                 });
             },
-            sortsCatagory(){
-                sortsCatagorysApi(this.$store.getters.getToken).then(res=>{
-                    this.data = res.data
-                }).catch(e=>{
-                    this.$message.error(e);
-                })
-            },
-            articlesInfo(articleId){
-                articlesInfoApi(articleId, this.$store.getters.getToken).then(res => {
-                    if (res.code == 0) {
-                        this.articleForm = res.data;
-                        if(res.data.labelsEntityList != ''&& res.data.labelsEntityList != null){
-                            //视图层更新
-                            this.$set(this.articleForm, 'labelNames', res.data.labelsEntityList.map(item=>item.labelName))
-                        }
-                    }
-                }).catch(e => {
-                    this.$message.error(e);
-                });
-            },
-            // 编辑操作
-            handleEdit(index, row) {
-                this.addArticle = true;
-                this.flag = false;
-                this.sortsCatagory();
-                this.articlesInfo(row.articleId)
-            },
             // 分页导航
             handlePageChange(val) {
                 this.$set(this.query, 'page', val);
                 this.getData(this.query);
             },
-            getValue(value, html) {
-                this.articleForm.articleContent = html;
-            },
             //关闭弹窗重置表单
             closeDialog() {
-                this.$refs.articleForm.resetFields();
+                this.$refs.stayForm.resetFields();
+            },
+            //发表回复
+            publishReply(index,row){
+                this.flag = true;
+                this.addStay = true;
+                this.stayForm.parentStayId = row.stayId;
+            },
+            //查看留言
+            checkReply(index,row){
+                this.flag = false
+                this.addStay = true
+                this.selectStayInfo(row.stayId)
+            },
+            //添加和编辑
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if (this.flag) {
+                            this.addStayMessage(this.stayForm.messageContent,this.stayForm.parentStayId)
+                        } else {
+                            this.updateStayInfo(this.stayForm)
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            //公共模块 添加留言并重新刷新留言
+            async addStayMessage(content,parentStayId){
+                try{
+                    const res = await addStayMessageApi(content,parentStayId);
+                    this.$message.success(res.msg);
+                    //关闭弹窗
+                    this.addStay = false
+                    //重新刷新表格
+                    this.handleSearch()
+                }catch (e) {
+                    this.$message.error(e)
+                }
+            },
+            //查看parentstayId是stayId的留言信息
+            async selectStayInfo(stayId){
+                try{
+                    const res = await selectStayInfoApi(stayId);
+                    this.stayForm = res.data;
+                }catch (e) {
+                    this.$message.error(e)
+                }
+            },
+            //修改留言内容
+            async updateStayInfo(stayForm){
+                try{
+                    const res = await updateStayInfoApi(stayForm);
+                    this.$message.success(res.msg);
+                    //关闭弹窗
+                    this.addStay = false
+                }catch (e) {
+                    this.$message.error(e)
+                }
             }
+
         }
     };
 </script>
 
 <style>
     @media only screen and (min-width: 321px) and (max-width: 768px){
-        .handle-box{
+       .stay .handle-box{
             display: none;
         }
     }
-    .article .handle-box {
+    .stay .handle-box {
         margin-bottom: 20px;
     }
 
-    .article .handle-select {
+    .stay .handle-select {
         width: 120px;
     }
 
-    .article .handle-input {
+    .stay .handle-input {
         width: 300px;
         display: inline-block;
     }
 
-    .article .table {
+    .stay .table {
         width: 100%;
         font-size: 14px;
     }
 
-    .article .red {
+    .stay .red {
         color: #ff0000;
     }
 
-    .article .mr10 {
+    .stay .mr10 {
         margin-right: 10px;
     }
 
-    .article .table-td-thumb {
+    .stay .table-td-thumb {
         display: block;
         margin: auto;
         width: 40px;
         height: 40px;
     }
 
-    .article .ql-snow .ql-picker-label::before {
+    .stay .ql-snow .ql-picker-label::before {
         position: absolute !important;
     }
 </style>

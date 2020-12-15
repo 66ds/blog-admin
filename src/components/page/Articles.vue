@@ -403,7 +403,7 @@
 
 <style>
     @media only screen and (min-width: 321px) and (max-width: 768px){
-        .handle-box{
+       .article .handle-box{
             display: none;
         }
     }
