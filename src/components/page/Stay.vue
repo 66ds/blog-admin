@@ -29,6 +29,7 @@
                     v-loading="loading"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
+                <el-table-column prop="stayId" label="留言标识" align="center"></el-table-column>
                 <el-table-column prop="userName" label="姓名" align="center"></el-table-column>
                 <el-table-column prop="stayUserIp" label="用户IP地址" align="center"></el-table-column>
                 <el-table-column prop="messageContent" label="留言内容" align="center"
@@ -88,11 +89,7 @@
 </template>
 
 <script>
-    import {stayMessageListApi,addStayMessageApi,selectStayInfoApi,updateStayInfoApi} from '../../api/stay.js'
-    import {
-        articlesDeleteApi,
-        articlesDeleteBatchApi
-    } from '../../api/articles';
+    import {stayMessageListApi,addStayMessageApi,selectStayInfoApi,updateStayInfoApi,stayDeleteBatchApi,stayDeleteApi} from '../../api/stay.js'
     export default {
         name: 'basetable',
         data() {
@@ -142,44 +139,10 @@
                 this.$set(this.query, 'page', 1);
                 this.getData(this.query);
             },
-            // 删除操作
-            handleDelete(index, row) {
-                // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
-                    type: 'warning'
-                }).then(() => {
-                    return articlesDeleteApi(row.articleId, this.$store.getters.getToken);
-                }).then(res => {
-                    if (res.code == 0) {
-                        this.$message.success('删除成功');
-                        this.handleSearch()
-                    }
-                }).catch((e) => {
-                    this.$message.error(e);
-                });
-            },
             // 多选操作
             handleSelectionChange(val) {
-                val = val.map(item => item.articleId)
+                val = val.map(item => item.stayId)
                 this.delList = val;
-            },
-            delAllSelection() {
-                if(this.delList.length == 0){
-                    return  this.$message.warning("请先选择");
-                }
-                // 二次确认删除
-                this.$confirm(`确定要删除${this.delList}吗？`, '提示', {
-                    type: 'warning'
-                }).then(() => {
-                    return articlesDeleteBatchApi(this.delList, this.$store.getters.getToken);
-                }).then(res => {
-                    if (res.code == 0) {
-                        this.$message.success('删除成功');
-                        this.handleSearch()
-                    }
-                }).catch((e) => {
-                    this.$message.error(e);
-                });
             },
             // 分页导航
             handlePageChange(val) {
@@ -189,6 +152,39 @@
             //关闭弹窗重置表单
             closeDialog() {
                 this.$refs.stayForm.resetFields();
+            },
+            //批量删除留言
+            delAllSelection() {
+                if(this.delList.length == 0){
+                    return  this.$message.warning("请先选择");
+                }
+                // 二次确认删除
+                this.$confirm(`确定要删除${this.delList}吗？`, '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    return stayDeleteBatchApi(this.delList);
+                }).then(res => {
+                    if (res.code == 0) {
+                        this.$message.success(res.msg);
+                        this.handleSearch()
+                    }
+                }).catch((e) => {
+                    this.$message.error(e);
+                });
+            },
+            // 删除单个留言
+            handleDelete(index, row) {
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    return stayDeleteApi(row.stayId);
+                }).then(res => {
+                        this.$message.success(res.msg);
+                        this.handleSearch()
+                }).catch((e) => {
+                    this.$message.error(e);
+                });
             },
             //发表回复
             publishReply(index,row){

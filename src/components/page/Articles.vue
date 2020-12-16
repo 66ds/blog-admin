@@ -241,7 +241,7 @@
             // 获取文章列表数据
             getData(query) {
                 this.loading = true
-                articlesListApi(query,this.$store.getters.getToken).then(res => {
+                articlesListApi(query).then(res => {
                     this.tableData = res.data.list;
                     this.pageTotal = res.data.totalCount || 0;
                     this.loading = false;
@@ -260,7 +260,7 @@
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    return articlesDeleteApi(row.articleId, this.$store.getters.getToken);
+                    return articlesDeleteApi(row.articleId);
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
@@ -283,10 +283,10 @@
                 this.$confirm(`确定要删除${this.delList}吗？`, '提示', {
                     type: 'warning'
                 }).then(() => {
-                    return articlesDeleteBatchApi(this.delList, this.$store.getters.getToken);
+                    return articlesDeleteBatchApi(this.delList);
                 }).then(res => {
                     if (res.code == 0) {
-                        this.$message.success('删除成功');
+                        this.$message.success(res.msg);
                         this.handleSearch()
                     }
                 }).catch((e) => {
@@ -294,14 +294,14 @@
                 });
             },
             sortsCatagory(){
-                sortsCatagorysApi(this.$store.getters.getToken).then(res=>{
+                sortsCatagorysApi().then(res=>{
                     this.data = res.data
                 }).catch(e=>{
                     this.$message.error(e);
                 })
             },
             articlesInfo(articleId){
-                articlesInfoApi(articleId, this.$store.getters.getToken).then(res => {
+                articlesInfoApi(articleId).then(res => {
                     if (res.code == 0) {
                         this.articleForm = res.data;
                         if(res.data.labelsEntityList != ''&& res.data.labelsEntityList != null){
@@ -335,7 +335,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         if (this.flag) {
-                            articlesAddApi(this.articleForm, this.$store.getters.getToken).then(res => {
+                            articlesAddApi(this.articleForm).then(res => {
                                 if (res.code == 0) {
                                     this.$message.success('添加成功');
                                     //关闭弹窗
@@ -349,7 +349,7 @@
                                 this.$message.error(e);
                             });
                         } else {
-                            articlesUpdateApi(this.articleForm, this.$store.getters.getToken).then(res => {
+                            articlesUpdateApi(this.articleForm).then(res => {
                                 if (res.code == 0) {
                                     this.$message.success('编辑成功');
                                     //关闭弹窗
@@ -376,7 +376,7 @@
                 // 第一步.将图片上传到服务器.
                 let formdata = new FormData();
                 formdata.append('file', $file);
-                fileUploadApi(formdata, this.$store.getters.getToken).then(res => {
+                fileUploadApi(formdata).then(res => {
                     if (res.code == 0) {
                         // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
                         // $vm.$img2Url 详情见本页末尾

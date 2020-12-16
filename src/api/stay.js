@@ -53,3 +53,26 @@ export const updateStayInfoApi = (stayForm) => {
         data:stayForm
     });
 };
+
+/**
+ * 批量删除留言
+ * @param stayIds
+ */
+export const stayDeleteBatchApi = (stayIds)=>{
+    return request({
+        url:"/api/v1/pri/staymessage/batch?stayIds="+stayIds,
+        method:"get"
+    })
+}
+
+/**
+ * 单个留言删除
+ * @param stayId
+ */
+export const stayDeleteApi = (stayId)=>{
+    return request({
+        url:"/api/v1/pri/staymessage/delete/"+stayId,
+        method:"post"
+    })
+}
+

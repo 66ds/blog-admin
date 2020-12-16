@@ -133,7 +133,6 @@
                 },
                 tableData: [],
                 menus: [],
-                token: this.$store.getters.getToken,
                 pageTotal: 0,
                 loading: true,
                 flag: true,
@@ -184,27 +183,27 @@
             // 触发搜索按钮
             handleSearch() {
                 this.$set(this.query, 'page', 1);
-                this.sortsList(this.query, this.token);
+                this.sortsList(this.query);
             },
             // 获取文章列表数据
             getData(query) {
                 //获取分类数据
-                this.sortsCatagory(this.token);
+                this.sortsCatagory();
                 //获取表格数据
-                this.sortsList(query, this.token);
+                this.sortsList(query);
             },
-            async sortsCatagory(token) {
+            async sortsCatagory() {
                 try {
-                    const res = await sortsCatagorysApi(token);
+                    const res = await sortsCatagorysApi();
                     this.menus = res.data;
                 } catch (e) {
                     this.$message.error(e);
                 }
             },
-            async sortsList(query, token) {
+            async sortsList(query) {
                 try {
                     this.loading = true
-                    const res = await sortsListApi(query, token);
+                    const res = await sortsListApi(query);
                     this.tableData = res.data.list;
                     this.pageTotal = res.data.totalCount || 0;
                     this.loading = false
@@ -213,9 +212,9 @@
                 }
 
             },
-            async sortsAdd(sortForm,token){
+            async sortsAdd(sortForm){
                 try{
-                    const res = await sortsAddApi(sortForm,token);
+                    const res = await sortsAddApi(sortForm);
                     if(res.code == 0){
                         //重新设0
                         this.$set(this.sortForm, 'parentSortId', 0);
@@ -223,10 +222,10 @@
                         //关闭弹窗
                         this.addSort = false;
                         //重新渲染树
-                        this.sortsCatagory(this.token);
+                        this.sortsCatagory(this);
                         //重新渲染表格
                         this.$set(this.query, 'page', 1);
-                        this.sortsList(this.query, this.token);
+                        this.sortsList(this.query);
                     }else{
                         this.$message.warning(res.msg);
                     }
@@ -234,17 +233,17 @@
                     this.$message.error(e);
                 }
             },
-            async sortsUpdate(sortForm,token){
+            async sortsUpdate(sortForm){
               try{
-                  const res = await sortsUpdateApi(sortForm,token);
+                  const res = await sortsUpdateApi(sortForm);
                   if(res.code == 0){
                       this.$message.success('编辑成功');
                       //关闭弹窗
                       this.addSort = false;
                       //重新渲染树
-                      this.sortsCatagory(this.token);
+                      this.sortsCatagory();
                       //重新渲染表格
-                      this.sortsList(this.query, this.token);
+                      this.sortsList(this.query);
                   }else{
                       this.$message.warning(res.msg);
                   }
@@ -252,9 +251,9 @@
                   this.$message.error(e);
               }
             },
-            async sortsInfo(sortId,token){
+            async sortsInfo(sortId){
                 try{
-                    const res = await sortsInfoApi(sortId,token);
+                    const res = await sortsInfoApi(sortId);
                     this.sortForm = res.data;
                 }catch (e) {
                     this.$message.error(e);
@@ -266,7 +265,7 @@
                 this.$confirm('确定要删除该分类和它子分类吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    return sortsDeleteApi(row.sortId, this.token);
+                    return sortsDeleteApi(row.sortId);
                 }).then(res => {
                     if (res.code == 0) {
                         this.$message.success('删除成功');
@@ -283,13 +282,13 @@
             async handleEdit(index, row) {
                 this.addSort = true;
                 this.flag = false;
-                this.sortsInfo(row.sortId,this.token);
+                this.sortsInfo(row.sortId);
             },
             // 分页导航
             handlePageChange(val) {
                 //重新加载表格数据
                 this.$set(this.query, 'page', val);
-                this.sortsList(this.query, this.token);
+                this.sortsList(this.query);
             },
             //添加和编辑
             submitForm(formName) {
@@ -297,9 +296,9 @@
                     if (valid) {
                         if (this.flag) {
                             //添加分类
-                            this.sortsAdd(this.sortForm, this.token);
+                            this.sortsAdd(this.sortForm);
                         } else {
-                            this.sortsUpdate(this.sortForm, this.token)
+                            this.sortsUpdate(this.sortForm)
                         }
                     } else {
                         return false;
