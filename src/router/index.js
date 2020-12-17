@@ -20,9 +20,9 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
                 {
-                    path: '/icon',
-                    component: () => import(/* webpackChunkName: "icon" */ '../components/page/Icon.vue'),
-                    meta: { title: '自定义图标' }
+                    path: '/link',
+                    component: () => import(/* webpackChunkName: "icon" */ '../components/page/Link.vue'),
+                    meta: { title: '友链管理' }
                 },
                 {
                     path: '/table',
